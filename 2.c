@@ -11,6 +11,7 @@ typedef struct Node {
     int heuristic;
 } Node;
 
+// Distancias rectas entre nodos
 int straight_line_distances[MAX_NODES][MAX_NODES] = {
     {0, 5, 9, 7, 7, 8, 15},
     {5, 0, 8, 14, 9, 13, 12},
@@ -21,6 +22,7 @@ int straight_line_distances[MAX_NODES][MAX_NODES] = {
     {15, 12, 15, 19, 17, 16, 0}
 };
 
+// Función para crear un nodo
 Node* createNode(char name, int heuristic) {
     Node* node = (Node*)malloc(sizeof(Node));
     node->name = name;
@@ -29,18 +31,21 @@ Node* createNode(char name, int heuristic) {
     return node;
 }
 
+// Función para agregar un vecino a un nodo
 void addNeighbor(Node* node, Node* neighbor) {
     if (node->num_neighbors < MAX_NEIGHBORS) {
         node->neighbors[node->num_neighbors++] = neighbor;
     } else {
-        printf("Error: Too many neighbors for node %c\n", node->name);
+        printf("Error: Demasiados vecinos para el nodo %c\n", node->name);
     }
 }
 
+// Función para obtener la distancia entre dos nodos
 int straightLineDistance(Node* node1, Node* node2) {
     return straight_line_distances[node1->name - 'A'][node2->name - 'A'];
 }
 
+// Búsqueda primero por lo mejor
 void BestFirstSearch(Node* start, Node* goal) {
     if (start == NULL || goal == NULL) return;
 
@@ -55,13 +60,13 @@ void BestFirstSearch(Node* start, Node* goal) {
         printf("%c -> ", current->name);
 
         if (current == goal) {
-            printf("Objetivo alcanzado!\n");
+            printf("¡Objetivo alcanzado!\n");
             return;
         }
 
-        visited[current->name - 'A'] = 1; // Mark the node as visited after dequeuing it
+        visited[current->name - 'A'] = 1; // Marcar el nodo como visitado después de sacarlo de la cola
 
-        // Sort the neighbors by the sum of heuristic value and accumulated distance
+        // Ordenar los vecinos por la suma del valor heurístico y la distancia acumulada
         for (int i = 0; i < current->num_neighbors; i++) {
             for (int j = i + 1; j < current->num_neighbors; j++) {
                 int distance_i = straightLineDistance(current->neighbors[i], goal);
@@ -85,6 +90,7 @@ void BestFirstSearch(Node* start, Node* goal) {
     printf("Objetivo no alcanzado desde el nodo inicial.\n");
 }
 
+// Búsqueda codiciosa
 void GreedySearch(Node* start, Node* goal) {
     if (start == NULL || goal == NULL) return;
 
@@ -93,12 +99,12 @@ void GreedySearch(Node* start, Node* goal) {
     printf("%c -> ", current->name);
 
     while (current != goal) {
-        visited[current->name - 'A'] = 1; // Mark the current node as visited
+        visited[current->name - 'A'] = 1; // Marcar el nodo actual como visitado
 
         Node* next = NULL;
         int min_distance = 9999;
 
-        // Find the neighbor closest to the goal and that has not been visited
+        // Encontrar el vecino más cercano al objetivo y que no haya sido visitado
         for (int i = 0; i < current->num_neighbors; i++) {
             Node* neighbor = current->neighbors[i];
             if (!visited[neighbor->name - 'A']) {
@@ -110,7 +116,7 @@ void GreedySearch(Node* start, Node* goal) {
             }
         }
 
-        // If there is no next node, it means the goal is not reachable
+        // Si no hay siguiente nodo, significa que el objetivo no es alcanzable
         if (next == NULL) {
             printf("Objetivo no alcanzado desde el nodo inicial.\n");
             return;
@@ -120,7 +126,7 @@ void GreedySearch(Node* start, Node* goal) {
         printf("%c -> ", current->name);
     }
 
-    printf("Objetivo alcanzado!\n");
+    printf("¡Objetivo alcanzado!\n");
 }
 
 int main() {
@@ -165,10 +171,10 @@ int main() {
 
     Node* goal = G;
 
-    printf("Tecnica primero por lo mejor A--G: ");
+    printf("Técnica de Primero el Mejor A--G: ");
     BestFirstSearch(A, goal);
 
-    printf("\nBusqueda vara A--G: ");
+    printf("\nBúsqueda Codiciosa A--G: ");
     GreedySearch(A, goal);
 
     return 0;
